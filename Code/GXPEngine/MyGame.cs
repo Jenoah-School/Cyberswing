@@ -12,7 +12,7 @@ public class MyGame : Game
     {
         GL.glfwSetWindowPos((Screen.PrimaryScreen.Bounds.Width - width) / 2, (Screen.PrimaryScreen.Bounds.Height - height) / 2);
         GL.glfwSetWindowTitle("RKed");
-
+        
         Instance = this;
     }
 
