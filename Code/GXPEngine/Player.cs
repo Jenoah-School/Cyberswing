@@ -1,9 +1,14 @@
-﻿using System;
+﻿using GXPEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public class Level
+class Player : Sprite
 {
-	public Level()
-	{
-
-	}
+    public Player() : base("Assets/Sprites/square.png")
+    {
+        SetOrigin(width / 2, height / 2);
+    }
 }

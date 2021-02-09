@@ -36,3 +36,10 @@ C:/Users/Jenoah/Dropbox/_CMGT/Year 1/Term 2/Game Programming/Gold Miner/GXPEngin
 /Users/jenoah/Dropbox/_CMGT/Year 1/Term 2/Game Programming/Gold Miner/GXPEngine/obj/x86/Debug/GXPEngine.csproj.CoreCompileInputs.cache
 /Users/jenoah/Dropbox/_CMGT/Year 1/Term 2/Game Programming/Gold Miner/GXPEngine/obj/x86/Debug/GXPEngine.exe
 /Users/jenoah/Dropbox/_CMGT/Year 1/Term 2/Game Programming/Gold Miner/GXPEngine/obj/x86/Debug/GXPEngine.pdb
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\bin\Debug\GXPEngine.exe.config
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\bin\Debug\GXPEngine.exe
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\bin\Debug\GXPEngine.pdb
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.csprojAssemblyReference.cache
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.csproj.CoreCompileInputs.cache
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.exe
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.pdb
