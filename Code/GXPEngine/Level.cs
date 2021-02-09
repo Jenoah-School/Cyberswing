@@ -7,16 +7,42 @@ using System.Threading.Tasks;
 
 
 
-class Level : GameObject
+public class Level : GameObject
 {
     private Player player = null;
+    private Sprite bottomPlane = null;
+    private GrapplePoint[] grapplePoints;
 
     public Level()
     {
+        grapplePoints = new GrapplePoint[2];
+
+        grapplePoints[0] = new GrapplePoint();
+        grapplePoints[0].SetXY(game.width / 4, 128);
+
+        grapplePoints[1] = new GrapplePoint();
+        grapplePoints[1].SetXY(game.width / 4 * 3, 128);
+
+        AddChild(grapplePoints[0]);
+        AddChild(grapplePoints[1]);
+
+        bottomPlane = new Sprite("Assets/Sprites/square.png", true, true);
+        bottomPlane.SetOrigin(bottomPlane.width / 2, bottomPlane.height / 2);
+        bottomPlane.width = game.width;
+        bottomPlane.SetXY(game.width / 2, game.height - bottomPlane.height / 2);
+        bottomPlane.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+
+        AddChild(bottomPlane);
+
         player = new Player();
 
         player.SetXY(game.width / 2, game.height / 2);
 
         AddChild(player);
+    }
+
+    public GrapplePoint[] GetGrapplePoints()
+    {
+        return grapplePoints;
     }
 }

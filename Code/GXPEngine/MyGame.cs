@@ -8,7 +8,8 @@ public class MyGame : Game
 {
     public static MyGame Instance = null;
 
-    private Level currentLevel = null;
+    public Level currentLevel = null;
+    private Sprite background = null;
 
     public MyGame() : base(1280, 720, false)
     {
@@ -19,6 +20,12 @@ public class MyGame : Game
 
         currentLevel = new Level();
 
+        background = new Sprite("Assets/Sprites/square.png", false, false);
+        background.SetColor(46f / 255f, 204f / 255f, 113f / 255f);
+        background.width = game.width;
+        background.height = game.height;
+
+        AddChild(background);
         AddChild(currentLevel);
     }
 
