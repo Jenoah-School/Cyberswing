@@ -12,18 +12,24 @@ class Player : Sprite
 
     private Vector2 inputVelocity = new Vector2();
 
-    private Vector2 globalVelocity = new Vector2();
     private Vector2 previousPosition = new Vector2();
 
-    //Speeds and heights
+    //Acceleration speeds
     private float moveAccelerationSpeed = 8f;
     private float grappleAccelerationSpeed = 1f;
 
+    //Jumping and falling
     private float fallSpeed = 4f;
     private float jumpHeight = 10f;
 
+    //Maximum speeds
     private float maxMoveSpeed = 4f;
     private float maxGrappleSpeed = 1.25f;
+
+    //Collision detection
+    private Vector2 moveDirection = new Vector2();
+    private int collisionCheckDistance = 32;
+    private Sprite collisionCheckObject = null;
 
     private float health = 100f;
 
@@ -45,7 +51,16 @@ class Player : Sprite
         grappleCable.SetColor(.1f, .1f, .1f);
         grappleCable.visible = false;
 
+        collisionCheckObject = new Sprite("Assets/Sprites/square.png", false, true);
+        collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
+        collisionCheckObject.scale = .1f;
+        collisionCheckObject.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        collisionCheckObject.visible = false;
+
+
+
         AddChild(grappleCable);
+        AddChild(collisionCheckObject);
     }
 
     void Update()
@@ -75,16 +90,29 @@ class Player : Sprite
             Move();
         }
 
-        x += inputVelocity.x;
-        y += inputVelocity.y;
+        if (!IsObstructed())
+        {
+            x += inputVelocity.x;
+            y += inputVelocity.y;
+
+            isGrounded = false;
+        }
+        else
+        {
+            isGrounded = true;
+            //isGrappling = false;
+            //grappleCable.visible = false;
+
+            inputVelocity = new Vector2();
+            x = previousPosition.x;
+            y = previousPosition.y;
+        }
 
         if (targetGrapplePoint != null)
         {
             grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y));
             grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
         }
-
-        globalVelocity = new Vector2(x, y) - previousPosition;
 
         previousPosition.x = x;
         previousPosition.y = y;
@@ -192,17 +220,44 @@ class Player : Sprite
     }
     #endregion
 
+    #region Collision
+
+    /// <summary>
+    /// Checks if the direction the player is moving in, is blocked by an object
+    /// </summary>
+    /// <returns>Returns true when path is blocked, otherwise, if path is free, returns false</returns>
+    private bool IsObstructed()
+    {
+        moveDirection = inputVelocity;
+        moveDirection = moveDirection.Normalize() * collisionCheckDistance;
+        collisionCheckObject.x = moveDirection.x;
+        collisionCheckObject.y = moveDirection.y;
+
+        GameObject[] collidedObjects = collisionCheckObject.GetCollisions();
+        if(collidedObjects.Length > 0)
+        {
+            for (int i = 0; i < collidedObjects.Length; i++)
+            {
+                if(collidedObjects[i] != this)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Backup collision check to see if player is colliding with any object
+    /// </summary>
+    /// <param name="other">Object that collision is detected with. Gets populated automatically</param>
     public void OnCollision(GameObject other)
     {
         //Console.WriteLine("Colliding with " + other);
         if (other.y > y)
         {
             isGrounded = true;
-            isGrappling = false;
-            grappleCable.visible = false;
-
-            x = previousPosition.x;
-            y = previousPosition.y;
         }
         else
         {
@@ -210,6 +265,8 @@ class Player : Sprite
         }
 
     }
+
+    #endregion
 
     #region Getters and Setters
     public void SetHealth(float _health)

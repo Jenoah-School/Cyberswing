@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 public class Level : GameObject
 {
     private Player player = null;
-    private Sprite bottomPlane = null;
     private GrapplePoint[] grapplePoints;
 
     private EasyDraw healthText;
@@ -28,13 +27,7 @@ public class Level : GameObject
         AddChild(grapplePoints[0]);
         AddChild(grapplePoints[1]);
 
-        bottomPlane = new Sprite("Assets/Sprites/square.png", true, true);
-        bottomPlane.SetOrigin(bottomPlane.width / 2, bottomPlane.height / 2);
-        bottomPlane.width = game.width;
-        bottomPlane.SetXY(game.width / 2, game.height - bottomPlane.height / 2);
-        bottomPlane.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
-
-        AddChild(bottomPlane);
+        AddBorders();
 
         player = new Player();
 
@@ -56,5 +49,47 @@ public class Level : GameObject
         healthText.Text("Health: " + player.GetHealth(), 8, 32);
 
         AddChild(healthText);
+    }
+
+    private void AddBorders()
+    {
+        Sprite topBorder = null;
+        Sprite rightBorder = null;
+        Sprite bottomBorder = null;
+        Sprite leftBorder = null;
+
+        topBorder = new Sprite("Assets/Sprites/square.png", true, true);
+        rightBorder = new Sprite("Assets/Sprites/square.png", true, true);
+        bottomBorder = new Sprite("Assets/Sprites/square.png", true, true);
+        leftBorder = new Sprite("Assets/Sprites/square.png", true, true);
+
+        topBorder.SetOrigin(topBorder.width / 2, topBorder.height / 2);
+        rightBorder.SetOrigin(rightBorder.width / 2, rightBorder.height / 2);
+        bottomBorder.SetOrigin(bottomBorder.width / 2, bottomBorder.height / 2);
+        leftBorder.SetOrigin(leftBorder.width / 2, leftBorder.height / 2);
+
+        topBorder.width = game.width;
+        bottomBorder.width = game.width;
+        rightBorder.width = 16;
+        leftBorder.width = 16;
+
+        topBorder.height = 16;
+        rightBorder.height = game.height;
+        leftBorder.height = game.height;
+
+        topBorder.SetXY(game.width / 2, topBorder.height / 2);
+        rightBorder.SetXY(game.width - rightBorder.width / 2, game.height / 2);
+        bottomBorder.SetXY(game.width / 2, game.height - bottomBorder.height / 2);
+        leftBorder.SetXY(leftBorder.width / 2, game.height / 2);
+
+        topBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+        rightBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+        bottomBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+        leftBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+
+        AddChild(topBorder);
+        AddChild(rightBorder);
+        AddChild(bottomBorder);
+        AddChild(leftBorder);
     }
 }
