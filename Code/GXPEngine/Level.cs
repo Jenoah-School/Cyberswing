@@ -13,6 +13,8 @@ public class Level : GameObject
     private Sprite bottomPlane = null;
     private GrapplePoint[] grapplePoints;
 
+    private EasyDraw healthText;
+
     public Level()
     {
         grapplePoints = new GrapplePoint[2];
@@ -39,10 +41,20 @@ public class Level : GameObject
         player.SetXY(game.width / 2, game.height / 2);
 
         AddChild(player);
+
+        DrawHUD();
     }
 
     public GrapplePoint[] GetGrapplePoints()
     {
         return grapplePoints;
+    }
+
+    public void DrawHUD()
+    {
+        healthText = new EasyDraw(game.width / 2, game.height / 4, false);
+        healthText.Text("Health: " + player.GetHealth(), 8, 32);
+
+        AddChild(healthText);
     }
 }

@@ -9,23 +9,30 @@ using System.Threading.Tasks;
 class Player : Sprite
 {
     private bool canMove = true;
-    private Vector2 moveVelocity = new Vector2();
-    private Vector2 globalVelocity = new Vector2();
-    private Vector2 grappleVelocity = new Vector2();
 
-    private Vector2 localVelocity = new Vector2();
+    private Vector2 inputVelocity = new Vector2();
+
+    private Vector2 globalVelocity = new Vector2();
     private Vector2 previousPosition = new Vector2();
 
     //Speeds and heights
+    private float moveAccelerationSpeed = 8f;
+    private float grappleAccelerationSpeed = 1f;
+
     private float fallSpeed = 4f;
-    private float moveSpeed = 8f;
     private float jumpHeight = 10f;
+
     private float maxMoveSpeed = 4f;
+    private float maxGrappleSpeed = 1.25f;
+
+    private float health = 100f;
 
     private bool isGrounded = false;
     private bool isGrappling = false;
 
     private Sprite grappleCable = null;
+
+    GrapplePoint targetGrapplePoint = null;
 
     public Player() : base("Assets/Sprites/square.png")
     {
@@ -35,8 +42,6 @@ class Player : Sprite
         grappleCable.SetOrigin(grappleCable.width / 2, 0);
 
         grappleCable.width = 8;
-        grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(Input.mouseX, Input.mouseY));
-        grappleCable.rotation = Mathf.Atan2(x - Input.mouseX, Input.mouseY - y) * 180f / Mathf.PI;
         grappleCable.SetColor(.1f, .1f, .1f);
         grappleCable.visible = false;
 
@@ -45,7 +50,6 @@ class Player : Sprite
 
     void Update()
     {
-        //This is a temporary key...
         if (!canMove)
         {
             return;
@@ -53,27 +57,32 @@ class Player : Sprite
 
         if (Input.GetMouseButtonDown(0))
         {
-            Grapple();
+            StartGrapple();
         }
-
-        Move();
-
-        if (Input.GetMouseButtonUp(0) || isGrounded)
+        else if (Input.GetMouseButtonUp(0))
         {
-            grappleVelocity = new Vector2();
             isGrappling = false;
             grappleCable.visible = false;
+            targetGrapplePoint = null;
         }
 
-        grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(Input.mouseX, Input.mouseY));
-        grappleCable.rotation = Mathf.Atan2(x - Input.mouseX, Input.mouseY - y) * 180f / Mathf.PI;
+        if (Input.GetMouseButton(0) && isGrappling)
+        {
+            Grapple();
+        }
+        else
+        {
+            Move();
+        }
 
-        localVelocity = isGrappling ? grappleVelocity : moveVelocity;
+        x += inputVelocity.x;
+        y += inputVelocity.y;
 
-        x += localVelocity.x;
-        y -= localVelocity.y;
-
-        
+        if (targetGrapplePoint != null)
+        {
+            grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y));
+            grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
+        }
 
         globalVelocity = new Vector2(x, y) - previousPosition;
 
@@ -81,6 +90,7 @@ class Player : Sprite
         previousPosition.y = y;
     }
 
+    #region Movement
     /// <summary>
     /// Moves the player to given input direction
     /// </summary>
@@ -88,21 +98,28 @@ class Player : Sprite
     {
         float horizontal = GameBehaviour.GetHorizontalAxis();
 
-        moveVelocity.x = horizontal * moveSpeed;// / Time.deltaTime;
+        inputVelocity.x += horizontal * moveAccelerationSpeed;// / Time.deltaTime;
 
+        if (isGrounded)
+        {
+            inputVelocity.x *= 0.75f;
+        }
+
+        if (inputVelocity.x < 0.01f && inputVelocity.x > -0.01f)
+        {
+            inputVelocity.x = 0f;
+        }
+
+        inputVelocity.x = Mathf.Clamp(inputVelocity.x, -maxMoveSpeed, maxMoveSpeed);
 
         if (Input.GetKeyDown(Key.SPACE) && isGrounded)
         {
-            moveVelocity.y += jumpHeight;
+
+            inputVelocity.y -= jumpHeight;
         }
 
-        moveVelocity.x = Mathf.Clamp(moveVelocity.x, -maxMoveSpeed, maxMoveSpeed);
-
         Fall();
-        //x += moveVelocity.x;
-        //y -= moveVelocity.y;
 
-        //Console.WriteLine(localVelocity);
         isGrounded = false;
     }
 
@@ -111,26 +128,27 @@ class Player : Sprite
     /// </summary>
     private void Fall()
     {
-        moveVelocity.y += GameBehaviour.gravity / Time.deltaTime;
-        moveVelocity.y = Mathf.Clamp(moveVelocity.y, GameBehaviour.gravity, 100f);
+        inputVelocity.y += -GameBehaviour.gravity / Time.deltaTime;
+        inputVelocity.y = Mathf.Clamp(inputVelocity.y, GameBehaviour.gravity, 100f);
 
-        if (moveVelocity.y < 0f && isGrounded)
+        if (inputVelocity.y > 0f && isGrounded)
         {
-            moveVelocity.y *= (fallSpeed - 1) / Time.deltaTime;
+            inputVelocity.y *= (fallSpeed - 1) / Time.deltaTime;
             if (isGrounded)
             {
-                moveVelocity.y = 0f;
+                inputVelocity.y = 0f;
             }
         }
     }
+    #endregion
 
-
+    #region Grapple
     /// <summary>
-    /// Attaches the grapple to designated spot if it is a valid one and sets velocity to it
+    /// Checks if there is a grapple point at the mouse position and sets it. Also starts displaying cable
     /// </summary>
-    private void Grapple()
+    private void StartGrapple()
     {
-        GrapplePoint targetGrapplePoint = null;
+        targetGrapplePoint = null;
         GrapplePoint[] grapplePoints = MyGame.Instance.currentLevel.GetGrapplePoints();
 
         for (int i = 0; i < grapplePoints.Length; i++)
@@ -142,21 +160,37 @@ class Player : Sprite
             }
         }
 
-        if(targetGrapplePoint == null)
+        if (targetGrapplePoint == null)
         {
             Console.WriteLine("No grapple point found");
             return;
         }
 
-        
-        Vector2 grappleDirection = new Vector2(targetGrapplePoint.x, targetGrapplePoint.y) - new Vector2(x, -y);
-        grappleDirection = grappleDirection.Normalize();
-        Console.WriteLine($"Direction to target grapple is: {grappleDirection}");
-        grappleVelocity = grappleDirection * jumpHeight;
+
         isGrappling = true;
         grappleCable.visible = true;
         //MyGame.Instance.AddChild(new ParticleSystem(20, new Vector2(Input.mouseX, Input.mouseY)));
     }
+
+
+    /// <summary>
+    /// Attaches the grapple to designated spot if it is a valid one and sets velocity to it
+    /// </summary>
+    private void Grapple()
+    {
+        if (targetGrapplePoint == null)
+        {
+            return;
+        }
+        Vector2 grappleDirection = new Vector2(targetGrapplePoint.x, targetGrapplePoint.y) - new Vector2(x, y);
+        grappleDirection.Normalize();
+        inputVelocity += grappleDirection * grappleAccelerationSpeed;
+        if (grappleDirection.Magnitude() >= maxGrappleSpeed)
+        {
+            inputVelocity = grappleDirection.Normalize() * maxGrappleSpeed;
+        }
+    }
+    #endregion
 
     public void OnCollision(GameObject other)
     {
@@ -166,11 +200,27 @@ class Player : Sprite
             isGrounded = true;
             isGrappling = false;
             grappleCable.visible = false;
+
+            x = previousPosition.x;
+            y = previousPosition.y;
         }
         else
         {
             isGrounded = false;
         }
-        
+
     }
+
+    #region Getters and Setters
+    public void SetHealth(float _health)
+    {
+        health = _health;
+    }
+
+    public float GetHealth()
+    {
+        return health;
+    }
+
+    #endregion
 }
