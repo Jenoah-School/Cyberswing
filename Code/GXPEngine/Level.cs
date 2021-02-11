@@ -1,4 +1,5 @@
 ﻿using GXPEngine;
+using GXPEngine.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,30 +13,48 @@ public class Level : GameObject
     private Player player = null;
     private GrapplePoint[] grapplePoints;
 
-    private EasyDraw healthText;
+    private HUD hud;
 
     public Level()
     {
+        AddBorders();
+
         grapplePoints = new GrapplePoint[2];
 
         grapplePoints[0] = new GrapplePoint();
-        grapplePoints[0].SetXY(game.width / 4, 128);
+        grapplePoints[0].width = 256;
+        grapplePoints[0].height = 32;
+        grapplePoints[0].SetXY(game.width / 8, game.height / 4 * 0.55f);
 
-        grapplePoints[1] = new GrapplePoint();
-        grapplePoints[1].SetXY(game.width / 4 * 3, 128);
+        grapplePoints[1] = new GrapplePoint(true);
+        grapplePoints[1].width = 256;
+        grapplePoints[1].height = 32;
+        grapplePoints[1].SetXY(game.width / 8 * 7, game.height / 4 * 0.85f);
 
         AddChild(grapplePoints[0]);
         AddChild(grapplePoints[1]);
 
-        AddBorders();
-
         player = new Player();
 
-        player.SetXY(game.width / 2, game.height / 2);
+        player.SetXY(game.width / 2, game.height / 4 * 3);
 
         AddChild(player);
 
-        DrawHUD();
+        hud = new HUD();
+
+        hud.DrawHealthbar(new Vector2(64, 8), new Vector2(384, 32));
+        //hud.DrawHookCharge(new Vector2(game.width - 416, 16), new Vector2(384, 32), 12);
+
+        //hud.SetHookCharge(1f);
+
+        AddChild(hud);
+
+        HealthPickup healthPickup = new HealthPickup(25);
+        healthPickup.SetXY(game.width / 8 * 7, game.height / 2);
+
+        AddChild(healthPickup);
+
+        player.SetHealth(100);
     }
 
     public GrapplePoint[] GetGrapplePoints()
@@ -43,12 +62,9 @@ public class Level : GameObject
         return grapplePoints;
     }
 
-    public void DrawHUD()
+    public HUD GetHUD()
     {
-        healthText = new EasyDraw(game.width / 2, game.height / 4, false);
-        healthText.Text("Health: " + player.GetHealth(), 8, 32);
-
-        AddChild(healthText);
+        return hud;
     }
 
     private void AddBorders()
@@ -82,14 +98,41 @@ public class Level : GameObject
         bottomBorder.SetXY(game.width / 2, game.height - bottomBorder.height / 2);
         leftBorder.SetXY(leftBorder.width / 2, game.height / 2);
 
-        topBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
-        rightBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
-        bottomBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
-        leftBorder.SetColor(41f / 255f, 128f / 255f, 185f / 255f);
+        topBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        rightBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        bottomBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        leftBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
 
         AddChild(topBorder);
         AddChild(rightBorder);
         AddChild(bottomBorder);
         AddChild(leftBorder);
+
+        Sprite blockTopLeft = null;
+        blockTopLeft = new Sprite("Assets/Sprites/square.png", true, true);
+        blockTopLeft.SetOrigin(blockTopLeft.width / 2, blockTopLeft.height / 2);
+        blockTopLeft.width = game.width / 4;
+        blockTopLeft.height = game.width / 12;
+        blockTopLeft.SetXY(blockTopLeft.width / 2, blockTopLeft.height / 2);
+        blockTopLeft.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        AddChild(blockTopLeft);
+
+        Sprite blockBottomRight = null;
+        blockBottomRight = new Sprite("Assets/Sprites/square.png", true, true);
+        blockBottomRight.SetOrigin(blockBottomRight.width / 2, blockBottomRight.height / 2);
+        blockBottomRight.width = game.width / 4;
+        blockBottomRight.height = game.width / 4;
+        blockBottomRight.SetXY(game.width - blockBottomRight.width / 2, game.height - topBorder.height);
+        blockBottomRight.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        AddChild(blockBottomRight);
+
+        Sprite blockTopRight = null;
+        blockTopRight = new Sprite("Assets/Sprites/square.png", true, true);
+        blockTopRight.SetOrigin(blockTopRight.width / 2, blockTopRight.height / 2);
+        blockTopRight.width = game.width / 4;
+        blockTopRight.height = game.width / 8;
+        blockTopRight.SetXY(game.width - blockTopRight.width / 2, blockTopRight.height / 2);
+        blockTopRight.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        AddChild(blockTopRight);
     }
 }

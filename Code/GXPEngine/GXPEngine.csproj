@@ -54,6 +54,8 @@
     <Compile Include="GXPEngine\AddOns\TiledLoader.cs" />
     <Compile Include="GXPEngine\CustomFunctions.cs" />
     <Compile Include="GXPEngine\UVOffsetSprite.cs" />
+    <Compile Include="HealthPickup.cs" />
+    <Compile Include="HUD.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="MyGame.cs" />
     <Compile Include="GXPEngine\Canvas.cs" />
@@ -93,7 +95,9 @@
     <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
+    <Compile Include="OneTimeAudio.cs" />
     <Compile Include="ParticleSystem.cs" />
+    <Compile Include="Pickup.cs" />
     <Compile Include="Player.cs" />
   </ItemGroup>
   <ItemGroup>

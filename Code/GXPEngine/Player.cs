@@ -28,13 +28,23 @@ class Player : Sprite
 
     //Collision detection
     private Vector2 moveDirection = new Vector2();
+    private Vector2 velocity = new Vector2();
+
     private int collisionCheckDistance = 32;
     private Sprite collisionCheckObject = null;
 
-    private float health = 100f;
+    private float health = 100;
+    private float grappleCooldown = 0.75f;
+    private float grappleLastUse = 0f;
 
-    private bool isGrounded = false;
+    private bool isColliding = false;
     private bool isGrappling = false;
+    private bool canStickToGrapple = false;
+    private bool hookIsPositive = false;
+
+    private int generalHealthDecrementTime = 0;
+    private int movementHealthDecrementTime = 0;
+    private int timedHealthAmount = 1;
 
     private Sprite grappleCable = null;
 
@@ -48,16 +58,15 @@ class Player : Sprite
         grappleCable.SetOrigin(grappleCable.width / 2, 0);
 
         grappleCable.width = 8;
-        grappleCable.SetColor(.1f, .1f, .1f);
+        grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
         grappleCable.visible = false;
 
         collisionCheckObject = new Sprite("Assets/Sprites/square.png", false, true);
         collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
-        collisionCheckObject.scale = .1f;
+        collisionCheckObject.width = (int)(width / 2f);
+        collisionCheckObject.height = (int)(height / 16f);
         collisionCheckObject.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
         collisionCheckObject.visible = false;
-
-
 
         AddChild(grappleCable);
         AddChild(collisionCheckObject);
@@ -70,15 +79,14 @@ class Player : Sprite
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && Time.time >= grappleLastUse)
         {
+            grappleLastUse = Time.time + (grappleCooldown * 1000);
             StartGrapple();
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            isGrappling = false;
-            grappleCable.visible = false;
-            targetGrapplePoint = null;
+            StopGrapple();
         }
 
         if (Input.GetMouseButton(0) && isGrappling)
@@ -90,20 +98,35 @@ class Player : Sprite
             Move();
         }
 
+        if (Input.GetMouseButtonUp(1))
+        {
+            hookIsPositive = !hookIsPositive;
+            if (hookIsPositive)
+            {
+                grappleCable.SetColor(231 / 255f, 76 / 255f, 60 / 255f);
+            }
+            else
+            {
+                grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
+                
+            }
+        }
+
         if (!IsObstructed())
         {
             x += inputVelocity.x;
             y += inputVelocity.y;
 
-            isGrounded = false;
+            isColliding = false;
         }
         else
         {
-            isGrounded = true;
+            isColliding = true;
             //isGrappling = false;
             //grappleCable.visible = false;
 
             inputVelocity = new Vector2();
+
             x = previousPosition.x;
             y = previousPosition.y;
         }
@@ -113,6 +136,28 @@ class Player : Sprite
             grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y));
             grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
         }
+
+        if (Time.time > generalHealthDecrementTime)
+        {
+            generalHealthDecrementTime = Time.time + (timedHealthAmount * 1000);
+            SetHealth(health - 1);
+            UpdateHealthbar();
+        }
+
+        if (velocity.Magnitude() != 0)
+        {
+            if (Time.time > movementHealthDecrementTime)
+            {
+                SetHealth(health - Time.deltaTime / 1000f);
+            }
+        }
+        else
+        {
+            movementHealthDecrementTime = Time.time + (timedHealthAmount * 1000);
+        }
+
+        velocity = new Vector2(x, y) - previousPosition;
+        //Console.WriteLine(velocity);
 
         previousPosition.x = x;
         previousPosition.y = y;
@@ -126,9 +171,9 @@ class Player : Sprite
     {
         float horizontal = GameBehaviour.GetHorizontalAxis();
 
-        inputVelocity.x += horizontal * moveAccelerationSpeed;// / Time.deltaTime;
+        inputVelocity.x += horizontal * moveAccelerationSpeed * Time.deltaTime / 100f;// / Time.deltaTime;
 
-        if (isGrounded)
+        if (isColliding)
         {
             inputVelocity.x *= 0.75f;
         }
@@ -140,7 +185,7 @@ class Player : Sprite
 
         inputVelocity.x = Mathf.Clamp(inputVelocity.x, -maxMoveSpeed, maxMoveSpeed);
 
-        if (Input.GetKeyDown(Key.SPACE) && isGrounded)
+        if (Input.GetKeyDown(Key.SPACE) && isColliding)
         {
 
             inputVelocity.y -= jumpHeight;
@@ -148,7 +193,7 @@ class Player : Sprite
 
         Fall();
 
-        isGrounded = false;
+        //isGrounded = false;
     }
 
     /// <summary>
@@ -159,10 +204,10 @@ class Player : Sprite
         inputVelocity.y += -GameBehaviour.gravity / Time.deltaTime;
         inputVelocity.y = Mathf.Clamp(inputVelocity.y, GameBehaviour.gravity, 100f);
 
-        if (inputVelocity.y > 0f && isGrounded)
+        if (inputVelocity.y > 0f && isColliding)
         {
             inputVelocity.y *= (fallSpeed - 1) / Time.deltaTime;
-            if (isGrounded)
+            if (isColliding)
             {
                 inputVelocity.y = 0f;
             }
@@ -181,7 +226,7 @@ class Player : Sprite
 
         for (int i = 0; i < grapplePoints.Length; i++)
         {
-            if (grapplePoints[i].HitTestPoint(Input.mouseX, Input.mouseY))
+            if (grapplePoints[i].HitTestPoint(Input.mouseX, Input.mouseY) && (hookIsPositive != grapplePoints[i].IsPositive()))
             {
                 targetGrapplePoint = grapplePoints[i];
                 break;
@@ -211,12 +256,25 @@ class Player : Sprite
             return;
         }
         Vector2 grappleDirection = new Vector2(targetGrapplePoint.x, targetGrapplePoint.y) - new Vector2(x, y);
+
         grappleDirection.Normalize();
         inputVelocity += grappleDirection * grappleAccelerationSpeed;
         if (grappleDirection.Magnitude() >= maxGrappleSpeed)
         {
             inputVelocity = grappleDirection.Normalize() * maxGrappleSpeed;
         }
+
+        
+    }
+
+    /// <summary>
+    /// Releases the hook and ends the grapple state
+    /// </summary>
+    private void StopGrapple()
+    {
+        isGrappling = false;
+        grappleCable.visible = false;
+        targetGrapplePoint = null;
     }
     #endregion
 
@@ -228,24 +286,48 @@ class Player : Sprite
     /// <returns>Returns true when path is blocked, otherwise, if path is free, returns false</returns>
     private bool IsObstructed()
     {
-        moveDirection = inputVelocity;
-        moveDirection = moveDirection.Normalize() * collisionCheckDistance;
+        moveDirection = velocity;
+        if (moveDirection.Magnitude() < 0.01f)
+        {
+            moveDirection = inputVelocity;
+        }
+
+        moveDirection.Normalize();
+        moveDirection.x = Mathf.Round(moveDirection.x);
+        moveDirection.y = Mathf.Round(moveDirection.y);
+
+        moveDirection *= collisionCheckDistance;
         collisionCheckObject.x = moveDirection.x;
         collisionCheckObject.y = moveDirection.y;
+        collisionCheckObject.rotation = Mathf.Atan2(moveDirection.x, -moveDirection.y) * 180f / Mathf.PI;
 
         GameObject[] collidedObjects = collisionCheckObject.GetCollisions();
         if(collidedObjects.Length > 0)
         {
             for (int i = 0; i < collidedObjects.Length; i++)
             {
-                if(collidedObjects[i] != this)
+
+                if (!canStickToGrapple && isGrappling && collidedObjects[i].GetType() == typeof(GrapplePoint))
+                {
+                    StopGrapple();
+                }
+
+                if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(Pickup))
                 {
                     return true;
                 }
+
+
             }
         }
 
         return false;
+    }
+
+    private void UpdateHealthbar()
+    {
+        Level currentLevel = (Level)parent;
+        currentLevel.GetHUD().SetHealth(Mathf.Round(health));
     }
 
     /// <summary>
@@ -255,13 +337,13 @@ class Player : Sprite
     public void OnCollision(GameObject other)
     {
         //Console.WriteLine("Colliding with " + other);
-        if (other.y > y)
+        if (other.y > y && other.GetType() != typeof(Pickup))
         {
-            isGrounded = true;
+            isColliding = true;
         }
         else
         {
-            isGrounded = false;
+            isColliding = false;
         }
 
     }
@@ -272,11 +354,18 @@ class Player : Sprite
     public void SetHealth(float _health)
     {
         health = _health;
+        health = Mathf.Clamp(health, 0, 100);
+        UpdateHealthbar();
+
+        if(health <= 0)
+        {
+            MyGame.Instance.RestartLevel();
+        }
     }
 
-    public float GetHealth()
+    public int GetHealth()
     {
-        return health;
+        return (int)health;
     }
 
     #endregion

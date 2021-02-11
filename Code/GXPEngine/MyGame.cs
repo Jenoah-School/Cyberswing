@@ -21,7 +21,7 @@ public class MyGame : Game
         currentLevel = new Level();
 
         background = new Sprite("Assets/Sprites/square.png", false, false);
-        background.SetColor(46f / 255f, 204f / 255f, 113f / 255f);
+        background.SetColor(149f / 255f, 165f / 255f, 166f / 255f);
         background.width = game.width;
         background.height = game.height;
 
@@ -32,5 +32,17 @@ public class MyGame : Game
     static void Main()
     {
         new MyGame().Start();
+    }
+
+    public void RestartLevel()
+    {
+        if(currentLevel != null)
+        {
+            currentLevel.LateDestroy();
+            currentLevel = null;
+        }
+
+        currentLevel = new Level();
+        AddChild(currentLevel);
     }
 }
