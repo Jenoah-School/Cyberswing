@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap');
+
+@keyframes transitionIn{
+    from{
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Hammersmith One', sans-serif;
+    scroll-behavior: smooth;
+}
+body{
+    
+    font-size: 14px;
+    font-weight: 400;
+    background-color: grey;
+}
+
+/*
+
+navigation bar
+
+*/
+
+header{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    z-index: 1000;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 20px 60px;
+    transition: 0.5s;
+}
+
+header a.logo{
+    font-size: 40px;
+    text-decoration: none;
+    color: black;
+    font-weight: 700;
+}
+header span{
+    color: red;
+}
+header nav ul li{
+    display: inline-block;
+}
+header nav ul li a{
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: 500;
+    transition: 0.3s;
+} 
+header nav ul li a:hover{
+    color: red;
+    letter-spacing: 2px;
+    transition: 0.3s;
+    
+
+}
+
+/*
+
+home page
+
+*/
+
+main section.Home{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    
+}
+main section.home .container{
+    display: flex;
+    flex-wrap: nowrap;
+    min-height: 60vh;
+    width: 80%;
+    justify-content: center;
+    
+    
+}
+main section.home .homePic{
+    width: 100%;
+    background-image: url(unknown.png);
+    
+    background-size: cover;
+
+    flex: 1;
+    animation: transitionIn 1s;
+}
+main section.Home .content{
+    background-color: darkgray;
+    width: 30%;
+    text-align: left;
+    animation: transitionIn 1s;
+    flex: 1;
+    
+}
+
+main section.Home .content h2{
+    margin: 100px 20% 0;
+    font-size: 40px;
+    font-weight: 700;
+    color: white;
+}
+
+main section.Home .content p{
+    margin: 0 20%;
+    font-size: 20px;
+    font-weight: 500;
+    color: white;
+}
+main section.Home .content a{
+    margin: 50px 20%;
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 20px;
+    text-decoration: none;
+    background-color: darkgreen;
+    color: white;
+    transition: 0.5s;
+}
+main section.Home .content a:hover{
+    letter-spacing: 2px;
+    transition: 0.5s;
+}
+
+/*
+
+project content page
+
+*/
+
+main section.Project{
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+}
+
+
+main Section.Project h1{
+    width: 100%;
+    text-align: center;
+    font-size: 50px;
+    margin-top: 200px;
+    font-weight: 700;
+    color: white;
+    animation: transitionIn 0.75s;
+}
+.slidershow {
+    width: 700px;
+    height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+.navigation {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    
+}
+.bar{
+    width: 50px;
+    height: 20px;
+    border: 2px solid white;
+    margin: 6px;
+    transition: 0.5s;
+}
+.bar:hover{
+    background-color: white;
+    transition: 0.5s;
+}
+
+input[name="r"]{
+    position: absolute;
+    visibility: hidden;
+}
+
+main section.Project .slidershow .slides{
+    width: 500%;
+    height: 100%;
+    display: flex;
+}
+main section.Project .slidershow .slides .slide{
+    width: 20%;
+    height: 100%;
+    transition: 0.6s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: blue;
+}
+
+#r1:checked ~ .s1{
+    margin-left: 0;
+}
+#r2:checked ~ .s1{
+    margin-left: -20%;
+}
+#r3:checked ~ .s1{
+    margin-left: -40%;
+}
+#r4:checked ~ .s1{
+    margin-left: -60%;
+}
+#r5:checked ~ .s1{
+    margin-left: -80%;
+}
+
+/*
+
+team introduction page
+
+*/
