@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DamageObject.cs" />
     <Compile Include="GameBehaviour.cs" />
     <Compile Include="GrapplePoint.cs" />
     <Compile Include="GXPEngine\AddOns\Gizmos.cs" />

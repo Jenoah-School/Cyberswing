@@ -12,11 +12,13 @@ public class Level : GameObject
 {
     private Player player = null;
     private GrapplePoint[] grapplePoints;
+    private Sprite background = null;
 
     private HUD hud;
 
-    public Level()
+    public Level(string _backgroundFileName)
     {
+        AddBackground(_backgroundFileName);
         AddBorders();
 
         grapplePoints = new GrapplePoint[2];
@@ -34,9 +36,9 @@ public class Level : GameObject
         AddChild(grapplePoints[0]);
         AddChild(grapplePoints[1]);
 
-        player = new Player();
+        player = new Player(.3f);
 
-        player.SetXY(game.width / 2, game.height / 4 * 3);
+        player.SetXY(game.width / 2, game.height / 4 * 2f);
 
         AddChild(player);
 
@@ -65,6 +67,15 @@ public class Level : GameObject
     public HUD GetHUD()
     {
         return hud;
+    }
+
+    private void AddBackground(string _backgroundFileName)
+    {
+        background = new Sprite(_backgroundFileName, false, false);
+        background.width = game.width;
+        background.height = game.height;
+
+        AddChild(background);
     }
 
     private void AddBorders()

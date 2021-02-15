@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-class Player : Sprite
+class Player : AnimationSprite
 {
     private bool canMove = true;
 
@@ -16,7 +16,7 @@ class Player : Sprite
 
     //Acceleration speeds
     private float moveAccelerationSpeed = 8f;
-    private float grappleAccelerationSpeed = 1f;
+    private float grappleAccelerationSpeed = .75f;
 
     //Jumping and falling
     private float fallSpeed = 4f;
@@ -24,7 +24,7 @@ class Player : Sprite
 
     //Maximum speeds
     private float maxMoveSpeed = 4f;
-    private float maxGrappleSpeed = 1.25f;
+    private float maxGrappleSpeed = 4f;
 
     //Collision detection
     private Vector2 moveDirection = new Vector2();
@@ -41,27 +41,34 @@ class Player : Sprite
     private bool isGrappling = false;
     private bool canStickToGrapple = false;
     private bool hookIsPositive = false;
+    private bool isFlipped = false;
 
     private int generalHealthDecrementTime = 0;
     private int movementHealthDecrementTime = 0;
     private int timedHealthAmount = 1;
 
+    private float localScale = 1f;
+
     private Sprite grappleCable = null;
 
     GrapplePoint targetGrapplePoint = null;
 
-    public Player() : base("Assets/Sprites/square.png")
+    public Player(float _scale = 1) : base("Assets/Sprites/Player/Walk.png", 4, 1)
     {
+        localScale = _scale;
+
         SetOrigin(width / 2, height / 2);
+
+        collisionCheckDistance = width / 2;
 
         grappleCable = new Sprite("Assets/Sprites/square.png", false, false);
         grappleCable.SetOrigin(grappleCable.width / 2, 0);
 
-        grappleCable.width = 8;
+        grappleCable.width = width / 16;
         grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
         grappleCable.visible = false;
 
-        collisionCheckObject = new Sprite("Assets/Sprites/square.png", false, true);
+        collisionCheckObject = new Sprite("Assets/Sprites/Lightning.png", false, true);
         collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
         collisionCheckObject.width = (int)(width / 2f);
         collisionCheckObject.height = (int)(height / 16f);
@@ -70,6 +77,9 @@ class Player : Sprite
 
         AddChild(grappleCable);
         AddChild(collisionCheckObject);
+
+        scale = localScale;
+        previousPosition = new Vector2(x, y);
     }
 
     void Update()
@@ -108,10 +118,11 @@ class Player : Sprite
             else
             {
                 grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
-                
+
             }
         }
 
+        //MoveAndCollide(GetCollisions());
         if (!IsObstructed())
         {
             x += inputVelocity.x;
@@ -129,12 +140,6 @@ class Player : Sprite
 
             x = previousPosition.x;
             y = previousPosition.y;
-        }
-
-        if (targetGrapplePoint != null)
-        {
-            grappleCable.height = (int)Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y));
-            grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
         }
 
         if (Time.time > generalHealthDecrementTime)
@@ -157,6 +162,39 @@ class Player : Sprite
         }
 
         velocity = new Vector2(x, y) - previousPosition;
+        if (velocity.Magnitude() > 0.1f)
+        {
+            if (velocity.x < 0 && !isFlipped)
+            {
+                isFlipped = true;
+                scaleX = -localScale;
+            }
+            else if (velocity.x > 0 && isFlipped)
+            {
+                isFlipped = false;
+                scaleX = localScale;
+            }
+
+            Animate();
+        }
+        else
+        {
+            SetFrame(0);
+        }
+
+        if (targetGrapplePoint != null)
+        {
+            grappleCable.height = (int)(Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y)) / localScale);
+            if (isFlipped)
+            {
+                grappleCable.rotation = Mathf.Atan2(targetGrapplePoint.x - x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
+            }
+            else
+            {
+                grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
+            }
+        }
+
         //Console.WriteLine(velocity);
 
         previousPosition.x = x;
@@ -259,12 +297,13 @@ class Player : Sprite
 
         grappleDirection.Normalize();
         inputVelocity += grappleDirection * grappleAccelerationSpeed;
-        if (grappleDirection.Magnitude() >= maxGrappleSpeed)
-        {
-            inputVelocity = grappleDirection.Normalize() * maxGrappleSpeed;
-        }
+        //if (!(inputVelocity.Magnitude() >= maxGrappleSpeed))
+        //{
+        //    inputVelocity = grappleDirection.Normalize() * maxGrappleSpeed;
+        //    Console.WriteLine($"Grapple speed = {inputVelocity.Magnitude()}");
+        //}
 
-        
+
     }
 
     /// <summary>
@@ -287,22 +326,30 @@ class Player : Sprite
     private bool IsObstructed()
     {
         moveDirection = velocity;
-        if (moveDirection.Magnitude() < 0.01f)
+        if (moveDirection.Magnitude() < 0.001f)
         {
             moveDirection = inputVelocity;
         }
 
+        //moveDirection.x = Mathf.Round(moveDirection.x);
+        //moveDirection.y = Mathf.Round(moveDirection.y);
+
         moveDirection.Normalize();
-        moveDirection.x = Mathf.Round(moveDirection.x);
-        moveDirection.y = Mathf.Round(moveDirection.y);
+        if (isFlipped)
+        {
+            moveDirection.x = -moveDirection.x;
+        }
+
 
         moveDirection *= collisionCheckDistance;
         collisionCheckObject.x = moveDirection.x;
         collisionCheckObject.y = moveDirection.y;
+
         collisionCheckObject.rotation = Mathf.Atan2(moveDirection.x, -moveDirection.y) * 180f / Mathf.PI;
 
+
         GameObject[] collidedObjects = collisionCheckObject.GetCollisions();
-        if(collidedObjects.Length > 0)
+        if (collidedObjects.Length > 0)
         {
             for (int i = 0; i < collidedObjects.Length; i++)
             {
@@ -314,20 +361,14 @@ class Player : Sprite
 
                 if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(Pickup))
                 {
+                    //Console.WriteLine($"Colliding with: {collidedObjects[i]}");
+                    ResolveCollision(collidedObjects[i] as Sprite);
                     return true;
                 }
-
-
             }
         }
 
         return false;
-    }
-
-    private void UpdateHealthbar()
-    {
-        Level currentLevel = (Level)parent;
-        currentLevel.GetHUD().SetHealth(Mathf.Round(health));
     }
 
     /// <summary>
@@ -337,8 +378,9 @@ class Player : Sprite
     public void OnCollision(GameObject other)
     {
         //Console.WriteLine("Colliding with " + other);
-        if (other.y > y && other.GetType() != typeof(Pickup))
+        if (other.y > y && other.GetType() != typeof(Pickup) && other != collisionCheckObject)
         {
+            //ResolveCollision(other as Sprite);
             isColliding = true;
         }
         else
@@ -348,16 +390,23 @@ class Player : Sprite
 
     }
 
+    void ResolveCollision(Sprite collider)
+    {
+        if (inputVelocity.x < 0) x = collider.x + collider.width;
+        if (inputVelocity.x > 0) x = collider.x - width;
+        if (inputVelocity.y < 0) y = collider.y + collider.height;
+        if (inputVelocity.y > 0) y = collider.y - height;
+    }
     #endregion
 
-    #region Getters and Setters
+    #region Health
     public void SetHealth(float _health)
     {
         health = _health;
         health = Mathf.Clamp(health, 0, 100);
         UpdateHealthbar();
 
-        if(health <= 0)
+        if (health <= 0)
         {
             MyGame.Instance.RestartLevel();
         }
@@ -366,6 +415,12 @@ class Player : Sprite
     public int GetHealth()
     {
         return (int)health;
+    }
+
+    private void UpdateHealthbar()
+    {
+        Level currentLevel = (Level)parent;
+        currentLevel.GetHUD().SetHealth(Mathf.Round(health));
     }
 
     #endregion

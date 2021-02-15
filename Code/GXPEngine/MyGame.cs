@@ -9,24 +9,20 @@ public class MyGame : Game
     public static MyGame Instance = null;
 
     public Level currentLevel = null;
-    private Sprite background = null;
+    
 
-    public MyGame() : base(1280, 720, false)
+    public MyGame() : base(1280, 720, false, false)
     {
         GL.glfwSetWindowPos((Screen.PrimaryScreen.Bounds.Width - width) / 2, (Screen.PrimaryScreen.Bounds.Height - height) / 2);
-        GL.glfwSetWindowTitle("RKed");
+        GL.glfwSetWindowTitle("Cyver Swing");
         
         Instance = this;
 
-        currentLevel = new Level();
+        currentLevel = new Level("Assets/Sprites/Background.png");
 
-        background = new Sprite("Assets/Sprites/square.png", false, false);
-        background.SetColor(149f / 255f, 165f / 255f, 166f / 255f);
-        background.width = game.width;
-        background.height = game.height;
-
-        AddChild(background);
         AddChild(currentLevel);
+
+        targetFps = 60;
     }
 
     static void Main()
@@ -42,7 +38,7 @@ public class MyGame : Game
             currentLevel = null;
         }
 
-        currentLevel = new Level();
+        currentLevel = new Level("Assets/Sprites/Background.png");
         AddChild(currentLevel);
     }
 }
