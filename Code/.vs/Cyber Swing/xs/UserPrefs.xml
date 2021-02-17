@@ -2,28 +2,31 @@
   <MonoDevelop.Ide.ItemProperties.GXPEngine PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="GXPEngine/MyGame.cs">
     <Files>
-      <File FileName="GXPEngine/MyGame.cs" Line="1" Column="1" />
+      <File FileName="GXPEngine/MyGame.cs" Line="18" Column="9" />
+      <File FileName="GXPEngine/GXPEngine/Core/GLContext.cs" />
+      <File FileName="GXPEngine/GXPEngine/OpenGL/GL.cs" />
+      <File FileName="GXPEngine/ParticleSystem.cs" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="GXPEngine" expanded="True" selected="True">
-            <Node name="GXPEngine" expanded="True" />
+          <Node name="Cyber Swing" expanded="True">
+            <Node name="GXPEngine" expanded="True">
+              <Node name="GXPEngine" expanded="True">
+                <Node name="Core" expanded="True" />
+              </Node>
+              <Node name="MyGame.cs" selected="True" />
+            </Node>
           </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Mono|x86" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <Debugger.DebugSourceFolders />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations>
-    <MultiItemSolutionRunConfiguration Id="Mono" Name="Mono" />
-  </MultiItemStartupConfigurations>
+  <MultiItemStartupConfigurations />
 </Properties>

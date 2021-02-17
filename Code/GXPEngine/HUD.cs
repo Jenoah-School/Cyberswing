@@ -16,12 +16,12 @@ public class HUD : GameObject
 
     public void DrawHealthbar(Vector2 _position, Vector2 _size, int _inset = 0)
     {
-        EasyDraw lightningSprite = new EasyDraw("Assets/Sprites/Lightning.png", false);
+        EasyDraw lightningSprite = new EasyDraw("Assets/Sprites/lightning.png", false);
         lightningSprite.SetOrigin(lightningSprite.width / 2, lightningSprite.height / 2);
-        lightningSprite.height = (int)_size.y + _inset;
-        lightningSprite.width = (int)_size.y + _inset;
-        lightningSprite.SetXY(_position.x - lightningSprite.width / 2, _position.y + lightningSprite.height / 2);
-        AddChild(lightningSprite);
+        lightningSprite.height = (int)_size.y + 32;
+        lightningSprite.width = (int)_size.y + 32;
+        lightningSprite.SetXY(_position.x, _position.y + lightningSprite.height / 4);
+        LateAddChild(lightningSprite);
 
         
 

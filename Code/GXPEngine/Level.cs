@@ -10,54 +10,18 @@ using System.Threading.Tasks;
 
 public class Level : GameObject
 {
-    private Player player = null;
-    private GrapplePoint[] grapplePoints;
-    private Sprite background = null;
+    protected Player player = null;
+    protected CameraFollow camera = null;
+    protected GrapplePoint[] grapplePoints;
+    private UVOffsetSprite background = null;
 
-    private HUD hud;
+    private Vector2 cameraVelocity = new Vector2();
+    private Vector2 previousCameraPosition = new Vector2();
 
-    public Level(string _backgroundFileName)
-    {
-        AddBackground(_backgroundFileName);
-        AddBorders();
+    private float backgroundScrollSpeed = .00085f;
+    protected int lowestLevelBarrier = 1024;
 
-        grapplePoints = new GrapplePoint[2];
-
-        grapplePoints[0] = new GrapplePoint();
-        grapplePoints[0].width = 256;
-        grapplePoints[0].height = 32;
-        grapplePoints[0].SetXY(game.width / 8, game.height / 4 * 0.55f);
-
-        grapplePoints[1] = new GrapplePoint(true);
-        grapplePoints[1].width = 256;
-        grapplePoints[1].height = 32;
-        grapplePoints[1].SetXY(game.width / 8 * 7, game.height / 4 * 0.85f);
-
-        AddChild(grapplePoints[0]);
-        AddChild(grapplePoints[1]);
-
-        player = new Player(.3f);
-
-        player.SetXY(game.width / 2, game.height / 4 * 2f);
-
-        AddChild(player);
-
-        hud = new HUD();
-
-        hud.DrawHealthbar(new Vector2(64, 8), new Vector2(384, 32));
-        //hud.DrawHookCharge(new Vector2(game.width - 416, 16), new Vector2(384, 32), 12);
-
-        //hud.SetHookCharge(1f);
-
-        AddChild(hud);
-
-        HealthPickup healthPickup = new HealthPickup(25);
-        healthPickup.SetXY(game.width / 8 * 7, game.height / 2);
-
-        AddChild(healthPickup);
-
-        player.SetHealth(100);
-    }
+    protected HUD hud;
 
     public GrapplePoint[] GetGrapplePoints()
     {
@@ -69,81 +33,174 @@ public class Level : GameObject
         return hud;
     }
 
-    private void AddBackground(string _backgroundFileName)
-    {
-        background = new Sprite(_backgroundFileName, false, false);
-        background.width = game.width;
-        background.height = game.height;
 
-        AddChild(background);
+    public GameObject GetCamera()
+    {
+        return camera;
     }
 
-    private void AddBorders()
+    protected void AddPlayer(int _xPos, int _yPos, Vector2 _boundriesX, Vector2 _boundriesY, int _startHealth = 100)
     {
-        Sprite topBorder = null;
-        Sprite rightBorder = null;
-        Sprite bottomBorder = null;
-        Sprite leftBorder = null;
+        player = new Player(.3f, new Vector2(_xPos, _yPos));
 
-        topBorder = new Sprite("Assets/Sprites/square.png", true, true);
-        rightBorder = new Sprite("Assets/Sprites/square.png", true, true);
-        bottomBorder = new Sprite("Assets/Sprites/square.png", true, true);
-        leftBorder = new Sprite("Assets/Sprites/square.png", true, true);
+        AddChild(player);
 
-        topBorder.SetOrigin(topBorder.width / 2, topBorder.height / 2);
-        rightBorder.SetOrigin(rightBorder.width / 2, rightBorder.height / 2);
-        bottomBorder.SetOrigin(bottomBorder.width / 2, bottomBorder.height / 2);
-        leftBorder.SetOrigin(leftBorder.width / 2, leftBorder.height / 2);
+        camera = new CameraFollow(player, _boundriesX, _boundriesY);
+        AddChild(camera);
 
-        topBorder.width = game.width;
-        bottomBorder.width = game.width;
-        rightBorder.width = 16;
-        leftBorder.width = 16;
+        hud = new HUD();
 
-        topBorder.height = 16;
-        rightBorder.height = game.height;
-        leftBorder.height = game.height;
+        hud.DrawHealthbar(new Vector2(64, 16) - new Vector2(game.width / 2, game.height / 2), new Vector2(384, 32));
 
-        topBorder.SetXY(game.width / 2, topBorder.height / 2);
-        rightBorder.SetXY(game.width - rightBorder.width / 2, game.height / 2);
-        bottomBorder.SetXY(game.width / 2, game.height - bottomBorder.height / 2);
-        leftBorder.SetXY(leftBorder.width / 2, game.height / 2);
+        camera.AddChild(hud);
 
-        topBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        rightBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        bottomBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        leftBorder.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
+        player.SetHealth(_startHealth);
+    }
 
-        AddChild(topBorder);
-        AddChild(rightBorder);
-        AddChild(bottomBorder);
-        AddChild(leftBorder);
+    protected void Update()
+    {
+        cameraVelocity.x = camera.x - previousCameraPosition.x;
+        cameraVelocity.y = camera.y - previousCameraPosition.y;
 
-        Sprite blockTopLeft = null;
-        blockTopLeft = new Sprite("Assets/Sprites/square.png", true, true);
-        blockTopLeft.SetOrigin(blockTopLeft.width / 2, blockTopLeft.height / 2);
-        blockTopLeft.width = game.width / 4;
-        blockTopLeft.height = game.width / 12;
-        blockTopLeft.SetXY(blockTopLeft.width / 2, blockTopLeft.height / 2);
-        blockTopLeft.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        AddChild(blockTopLeft);
+        background.x = camera.x;
+        background.y = camera.y;
+        background.AddOffset(cameraVelocity.x * backgroundScrollSpeed, 0);
 
-        Sprite blockBottomRight = null;
-        blockBottomRight = new Sprite("Assets/Sprites/square.png", true, true);
-        blockBottomRight.SetOrigin(blockBottomRight.width / 2, blockBottomRight.height / 2);
-        blockBottomRight.width = game.width / 4;
-        blockBottomRight.height = game.width / 4;
-        blockBottomRight.SetXY(game.width - blockBottomRight.width / 2, game.height - topBorder.height);
-        blockBottomRight.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        AddChild(blockBottomRight);
+        previousCameraPosition.x = camera.x;
+        previousCameraPosition.y = camera.y;
 
-        Sprite blockTopRight = null;
-        blockTopRight = new Sprite("Assets/Sprites/square.png", true, true);
-        blockTopRight.SetOrigin(blockTopRight.width / 2, blockTopRight.height / 2);
-        blockTopRight.width = game.width / 4;
-        blockTopRight.height = game.width / 8;
-        blockTopRight.SetXY(game.width - blockTopRight.width / 2, blockTopRight.height / 2);
-        blockTopRight.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
-        AddChild(blockTopRight);
+        background.width = (int)(game.width * camera.scale);
+        background.height = (int)(game.height * camera.scale);
+        //background.SetXY(game.width / 2f, game.height / 2f);
+
+        if (player.y > lowestLevelBarrier)
+        {
+            MyGame.Instance.RestartLevel();
+        }
+    }
+
+    protected Pickup NewHealthPickup(int _xPos, int _yPos, int _health = 25)
+    {
+        HealthPickup healthPickup = new HealthPickup(25);
+        healthPickup.SetXY(_xPos, _yPos);
+
+        return healthPickup;
+    }
+
+    protected Sprite NewBlock(int _xPos, int _yPos, int _width, int _height, bool _doDebug = false)
+    {
+        Sprite block = new Sprite("Assets/Sprites/Blocks/main.png", true, true);
+
+        block.width = _width;
+        block.height = _height;
+
+        float rows = (float)_width / GameBehaviour.tileSize;
+        float columns = (float)_height / GameBehaviour.tileSize;
+
+        Vector2 blockScale = new Vector2(GameBehaviour.tileSize, GameBehaviour.tileSize);
+        blockScale = block.InverseTransformDirection(blockScale.x, blockScale.y);
+
+        if (_doDebug)
+        {
+            Console.WriteLine($"{_width}, {_height}: Rows = {rows} and columns = {columns}");
+            Console.WriteLine($"Block size: {blockScale.x} x {blockScale.y}");
+        }
+
+        Random randBlock = new Random(1);
+        int randomBlockIndex = 1;
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                Sprite tempBlock = null;
+                if (j == 0)
+                {
+                    if (i == 0)
+                    {
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/corner_left.png", true, false);
+                    }
+                    else if (i == rows - 1)
+                    {
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/corner_right.png", true, false);
+                    }
+                    else
+                    {
+                        randomBlockIndex = randBlock.Next(1, 3);
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/floor" + randomBlockIndex + ".png", true, false);
+                    }
+                }else if(j == columns - 1)
+                {
+                        randomBlockIndex = randBlock.Next(1, 3);
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/ceiling" + randomBlockIndex + ".png", true, false);
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/edge_left.png", true, false);
+                    } else if (i == rows - 1)
+                    {
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/edge_right.png", true, false);
+                    }
+                    else
+                    {
+                        tempBlock = new Sprite("Assets/Sprites/Blocks/main.png", true, false);
+                    }
+                }
+                tempBlock.width = Mathf.Round(blockScale.x);
+                tempBlock.height = Mathf.Round(blockScale.y);
+                tempBlock.x = Mathf.Round(i * blockScale.x);
+                tempBlock.y = Mathf.Round(j * blockScale.y);
+
+                block.AddChild(tempBlock);
+            }
+        }
+
+        block.SetXY(_xPos, _yPos);
+
+        return block;
+    }
+
+    protected GrapplePoint NewGrapplePoint(int _xPos, int _yPos, int _width, int _height, bool _isPositive)
+    {
+        GrapplePoint grapplePoint = new GrapplePoint(_width, _height, _isPositive);
+        grapplePoint.SetXY(_xPos, _yPos);
+
+        return grapplePoint;
+    }
+
+    protected ElectricNet NewElectricNet(int _xPos, int _yPos)
+    {
+        ElectricNet electricNet = new ElectricNet();
+        electricNet.SetXY(_xPos, _yPos);
+
+        return electricNet;
+    }
+
+    protected void AddBackground(string _backgroundFileName)
+    {
+        background = new UVOffsetSprite(_backgroundFileName, false, false);
+        background.SetOrigin(background.width / 2, background.height / 2);
+        background.width = (int)(game.width * camera.scale);
+        background.height = (int)(game.height * camera.scale);
+        background.SetXY(-game.width / 2, -game.height / 2);
+
+        LateAddChildAt(background, 0);
+    }
+
+    public void MuteAllObjects()
+    {
+
+    }
+
+    public Player GetPlayer()
+    {
+        return player;
+    }
+
+    public virtual void StopAudio()
+    {
+        Console.WriteLine("No audio to stop");
     }
 }

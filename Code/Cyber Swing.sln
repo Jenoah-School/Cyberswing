@@ -14,8 +14,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Debug|x86.ActiveCfg = Debug|x86
 		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Debug|x86.Build.0 = Debug|x86
-		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Mono|x86.ActiveCfg = Debug|x86
-		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Mono|x86.Build.0 = Debug|x86
+		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Mono|x86.ActiveCfg = Release|x86
+		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Mono|x86.Build.0 = Release|x86
 		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Release|x86.ActiveCfg = Release|x86
 		{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
@@ -31,21 +31,7 @@ Global
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$0.TextStylePolicy = $7
-		$2.inheritsSet = null
-		$2.scope = text/x-csharp
-		$0.CSharpFormattingPolicy = $3
-		$3.scope = text/x-csharp
-		$4.FileWidth = 80
-		$4.TabsToSpaces = True
-		$4.scope = text/plain
-		$5.inheritsSet = null
-		$5.scope = application/config+xml
-		$0.XmlFormattingPolicy = $8
-		$6.inheritsSet = null
-		$6.scope = application/config+xml
-		$7.inheritsSet = null
-		$7.scope = application/xml
-		$8.scope = application/xml
-		$0.StandardHeader = $9
+		$0.StandardHeader = $8
+		$0.VersionControlPolicy = $9
 	EndGlobalSection
 EndGlobal

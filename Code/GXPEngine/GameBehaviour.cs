@@ -9,6 +9,8 @@ public static class GameBehaviour
 {
     public const float gravity = -9.81f;
 
+    public const int tileSize = 128;
+
     public static float GetHorizontalAxis()
     {
         float horizontalInput = 0f;

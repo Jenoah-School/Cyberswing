@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-class Pickup : Sprite
+public class Pickup : Sprite
 {
     public Pickup(string _fileName) : base(_fileName, true)
     {

@@ -6,7 +6,7 @@ public class UVOffsetSprite : Sprite
     protected float _offsetX = 0;
     protected float _offsetY = 0;
 
-    public UVOffsetSprite(string filename) : base(filename)
+    public UVOffsetSprite(string filename, bool useCache = false, bool addCollider = false) : base(filename, useCache, addCollider)
     {
         texture.wrap = true;
     }

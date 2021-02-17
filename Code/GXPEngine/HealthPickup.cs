@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-class HealthPickup : Pickup
+public class HealthPickup : Pickup
 {
     private int healthPoints = 10;
 
-    public HealthPickup(int _healthPoints) : base("Assets/Sprites/square.png")
+    public HealthPickup(int _healthPoints) : base("Assets/Sprites/healthPickup.png")
     {
         healthPoints = _healthPoints;
-        SetColor(241f / 255f, 196f / 255f, 15f / 255f);
+        width = 64;
+        height = 64;
     }
 
     public override void OnCollision(GameObject other)

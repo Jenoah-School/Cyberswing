@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-class Player : AnimationSprite
+public class Player : AnimationSprite
 {
     private bool canMove = true;
 
@@ -50,11 +50,13 @@ class Player : AnimationSprite
     private float localScale = 1f;
 
     private Sprite grappleCable = null;
+    private Vector2 grapplePos = new Vector2();
 
     GrapplePoint targetGrapplePoint = null;
 
-    public Player(float _scale = 1) : base("Assets/Sprites/Player/Walk.png", 4, 1)
+    public Player(float _scale = 1, Vector2 _startPosition = new Vector2()) : base("Assets/Sprites/Player/Walk.png", 4, 2)
     {
+        _animationDelay = 5;
         localScale = _scale;
 
         SetOrigin(width / 2, height / 2);
@@ -65,10 +67,10 @@ class Player : AnimationSprite
         grappleCable.SetOrigin(grappleCable.width / 2, 0);
 
         grappleCable.width = width / 16;
-        grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
+        grappleCable.SetColor(22f / 255f, 197f / 255f, 240f / 255f);
         grappleCable.visible = false;
 
-        collisionCheckObject = new Sprite("Assets/Sprites/Lightning.png", false, true);
+        collisionCheckObject = new Sprite("Assets/Sprites/lightning.png", false, true);
         collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
         collisionCheckObject.width = (int)(width / 2f);
         collisionCheckObject.height = (int)(height / 16f);
@@ -79,7 +81,9 @@ class Player : AnimationSprite
         AddChild(collisionCheckObject);
 
         scale = localScale;
-        previousPosition = new Vector2(x, y);
+        x = _startPosition.x;
+        y = _startPosition.y;
+        previousPosition = _startPosition;
     }
 
     void Update()
@@ -113,11 +117,11 @@ class Player : AnimationSprite
             hookIsPositive = !hookIsPositive;
             if (hookIsPositive)
             {
-                grappleCable.SetColor(231 / 255f, 76 / 255f, 60 / 255f);
+                grappleCable.SetColor(226f / 255f, 50f / 255f, 9f / 255f);
             }
             else
             {
-                grappleCable.SetColor(52f / 255f, 152f / 255f, 219f / 255f);
+                grappleCable.SetColor(22f / 255f, 197f / 255f, 240f / 255f);
 
             }
         }
@@ -175,7 +179,10 @@ class Player : AnimationSprite
                 scaleX = localScale;
             }
 
-            Animate();
+            if (!isGrappling && Mathf.Abs(velocity.y) < 2f)
+            {
+                Animate();
+            }
         }
         else
         {
@@ -184,14 +191,14 @@ class Player : AnimationSprite
 
         if (targetGrapplePoint != null)
         {
-            grappleCable.height = (int)(Vector2.Distance(new Vector2(x, y), new Vector2(targetGrapplePoint.x, targetGrapplePoint.y)) / localScale);
+            grappleCable.height = (int)(Vector2.Distance(new Vector2(x, y), new Vector2(grapplePos.x, grapplePos.y)) / localScale);
             if (isFlipped)
             {
-                grappleCable.rotation = Mathf.Atan2(targetGrapplePoint.x - x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
+                grappleCable.rotation = Mathf.Atan2(grapplePos.x - x, grapplePos.y - y) * 180f / Mathf.PI;
             }
             else
             {
-                grappleCable.rotation = Mathf.Atan2(x - targetGrapplePoint.x, targetGrapplePoint.y - y) * 180f / Mathf.PI;
+                grappleCable.rotation = Mathf.Atan2(x - grapplePos.x, grapplePos.y - y) * 180f / Mathf.PI;
             }
         }
 
@@ -261,11 +268,15 @@ class Player : AnimationSprite
     {
         targetGrapplePoint = null;
         GrapplePoint[] grapplePoints = MyGame.Instance.currentLevel.GetGrapplePoints();
+        Level parentLevel = (Level)parent;
+
+        Vector2 globalMousePos = (parentLevel.GetCamera().TransformPoint(Input.mouseX, Input.mouseY) - new Vector2(game.width / 2, game.height / 2) * parentLevel.GetCamera().scale);
 
         for (int i = 0; i < grapplePoints.Length; i++)
         {
-            if (grapplePoints[i].HitTestPoint(Input.mouseX, Input.mouseY) && (hookIsPositive != grapplePoints[i].IsPositive()))
+            if (grapplePoints[i].CheckHitbox(globalMousePos.x, globalMousePos.y) && (hookIsPositive != grapplePoints[i].IsPositive()))
             {
+                grapplePos = grapplePoints[i].GetGrapplePosition(globalMousePos.x);
                 targetGrapplePoint = grapplePoints[i];
                 break;
             }
@@ -280,6 +291,7 @@ class Player : AnimationSprite
 
         isGrappling = true;
         grappleCable.visible = true;
+        SetFrame(4);
         //MyGame.Instance.AddChild(new ParticleSystem(20, new Vector2(Input.mouseX, Input.mouseY)));
     }
 
@@ -293,7 +305,7 @@ class Player : AnimationSprite
         {
             return;
         }
-        Vector2 grappleDirection = new Vector2(targetGrapplePoint.x, targetGrapplePoint.y) - new Vector2(x, y);
+        Vector2 grappleDirection = grapplePos - new Vector2(x, y);
 
         grappleDirection.Normalize();
         inputVelocity += grappleDirection * grappleAccelerationSpeed;
@@ -354,12 +366,12 @@ class Player : AnimationSprite
             for (int i = 0; i < collidedObjects.Length; i++)
             {
 
-                if (!canStickToGrapple && isGrappling && collidedObjects[i].GetType() == typeof(GrapplePoint))
+                if (!canStickToGrapple && isGrappling && collidedObjects[i] as GrapplePoint != null)
                 {
                     StopGrapple();
                 }
 
-                if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(Pickup))
+                if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(HealthPickup) && collidedObjects[i].GetType() != typeof(ElectricNet))
                 {
                     //Console.WriteLine($"Colliding with: {collidedObjects[i]}");
                     ResolveCollision(collidedObjects[i] as Sprite);
@@ -378,7 +390,7 @@ class Player : AnimationSprite
     public void OnCollision(GameObject other)
     {
         //Console.WriteLine("Colliding with " + other);
-        if (other.y > y && other.GetType() != typeof(Pickup) && other != collisionCheckObject)
+        if (other.y > y && other.GetType() != typeof(HealthPickup) && other != collisionCheckObject)
         {
             //ResolveCollision(other as Sprite);
             isColliding = true;
@@ -424,4 +436,9 @@ class Player : AnimationSprite
     }
 
     #endregion
+
+    public Vector2 GetVelocity()
+    {
+        return velocity;
+    }
 }

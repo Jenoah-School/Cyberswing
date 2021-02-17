@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-class DamageObject : Sprite
+public class DamageObject : Sprite
 {
     int damage = 5;
     bool isColliding = false;
@@ -18,6 +18,7 @@ class DamageObject : Sprite
 
     void OnCollision(GameObject other)
     {
+        Console.WriteLine(other);
         if(other.GetType() == typeof(Player))
         {
             isColliding = true;

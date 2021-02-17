@@ -14,11 +14,11 @@ public class MyGame : Game
     public MyGame() : base(1280, 720, false, false)
     {
         GL.glfwSetWindowPos((Screen.PrimaryScreen.Bounds.Width - width) / 2, (Screen.PrimaryScreen.Bounds.Height - height) / 2);
-        GL.glfwSetWindowTitle("Cyver Swing");
+        GL.glfwSetWindowTitle("Cyber Swing");
         
         Instance = this;
 
-        currentLevel = new Level("Assets/Sprites/Background.png");
+        currentLevel = new Level1();
 
         AddChild(currentLevel);
 
@@ -35,10 +35,11 @@ public class MyGame : Game
         if(currentLevel != null)
         {
             currentLevel.LateDestroy();
+            currentLevel.StopAudio();
             currentLevel = null;
         }
 
-        currentLevel = new Level("Assets/Sprites/Background.png");
-        AddChild(currentLevel);
+        currentLevel = new Level1();
+        LateAddChild(currentLevel);
     }
 }

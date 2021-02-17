@@ -83,9 +83,9 @@ namespace GXPEngine.Core {
 			WindowSize.instance.height = height;
 			_realToLogicWidthRatio = (double)realWidth / width;
 			_realToLogicHeightRatio = (double)realHeight / height;
-			_vsyncEnabled = vSync;
-			
-			GL.glfwInit();
+            _vsyncEnabled = vSync;
+
+            GL.glfwInit();
 			
 			GL.glfwOpenWindowHint(GL.GLFW_FSAA_SAMPLES, 8);
 			GL.glfwOpenWindow(realWidth, realHeight, 8, 8, 8, 8, 24, 0, (fullScreen?GL.GLFW_FULLSCREEN:GL.GLFW_WINDOWED));

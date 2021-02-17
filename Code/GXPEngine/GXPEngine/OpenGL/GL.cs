@@ -196,8 +196,8 @@ namespace GXPEngine.OpenGL {
 		[DllImport("lib/glfw.dll")]
 		public static extern bool glfwGetKey(int key);
 		[DllImport("lib/glfw.dll")]
-		public static extern void glfwSetKeyCallback(GLFWKeyCallback callback);
-		[DllImport("lib/glfw.dll")]
+        public static extern void glfwSetKeyCallback(GLFWKeyCallback callback);
+        [DllImport("lib/glfw.dll")]
 		public static extern void glfwOpenWindowHint(int name, int value);
 		[DllImport("lib/glfw.dll")]
 		public static extern bool glfwGetMousePos(out int x, out int y);

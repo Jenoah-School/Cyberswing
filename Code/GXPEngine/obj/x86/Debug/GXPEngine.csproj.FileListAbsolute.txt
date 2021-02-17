@@ -42,3 +42,4 @@ C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\b
 C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.csproj.CoreCompileInputs.cache
 C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.exe
 C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.pdb
+C:\Users\Jenoah\Dropbox\_CMGT\Year 1\Projects\Lift-off\Team-PF3\Code\GXPEngine\obj\x86\Debug\GXPEngine.csprojAssemblyReference.cache
