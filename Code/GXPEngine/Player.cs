@@ -50,6 +50,7 @@ public class Player : AnimationSprite
     private Sprite redCable = null;
     private Sprite grappleCable = null;
     private Vector2 grapplePos = new Vector2();
+    private AnimationSprite visors = null;
 
     GrapplePoint targetGrapplePoint = null;
 
@@ -60,10 +61,16 @@ public class Player : AnimationSprite
 
         SetOrigin(width / 2, height / 2);
 
+        visors = new AnimationSprite("Assets/Sprites/Player/Walk_visors.png", 4, 2, -1, false, false);
+        //visors.SetOrigin(width / 2, height / 2);
+        visors.width = width;
+        visors.height = height;
+        visors.SetXY(-width / 2, -height / 2);
+
         collisionCheckDistance = width / 2;
 
-        redCable = new Sprite("Assets/Sprites/chain_red.png", false, false);
-        blueCable = new Sprite("Assets/Sprites/chain_blue.png", false, false);
+        redCable = new Sprite("Assets/Sprites/chain_red_long.png", false, false);
+        blueCable = new Sprite("Assets/Sprites/chain_blue_long.png", false, false);
 
         redCable.SetOrigin(redCable.width / 2, 0);
         blueCable.SetOrigin(blueCable.width / 2, 0);
@@ -74,7 +81,7 @@ public class Player : AnimationSprite
         redCable.visible = false;
         blueCable.visible = false;
 
-        grappleCable = redCable;
+        grappleCable = blueCable;
 
         collisionCheckObject = new Sprite("Assets/Sprites/lightning.png", false, true);
         collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
@@ -83,6 +90,7 @@ public class Player : AnimationSprite
         collisionCheckObject.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
         collisionCheckObject.visible = false;
 
+        LateAddChild(visors);
         AddChild(redCable);
         AddChild(blueCable);
         AddChild(grappleCable);
@@ -145,12 +153,15 @@ public class Player : AnimationSprite
             if (hookIsPositive)
             {
                 grappleCable = redCable;
+                visors.alpha = 0;
             }
             else
             {
                 grappleCable = blueCable;
-
+                visors.alpha = 1;
             }
+
+            ((Level)parent).GetHUD().ChangeLightningPolarity(hookIsPositive);
         }
 
         //MoveAndCollide(GetCollisions());
@@ -209,11 +220,13 @@ public class Player : AnimationSprite
             if (!isGrappling && Mathf.Abs(velocity.y) < 2f)
             {
                 Animate();
+                visors.SetFrame(currentFrame);
             }
         }
         else
         {
             SetFrame(0);
+            visors.SetFrame(0);
         }
 
         if (targetGrapplePoint != null)
@@ -319,6 +332,7 @@ public class Player : AnimationSprite
         isGrappling = true;
         grappleCable.visible = true;
         SetFrame(4);
+        visors.SetFrame(4);
         //MyGame.Instance.AddChild(new ParticleSystem(20, new Vector2(Input.mouseX, Input.mouseY)));
     }
 

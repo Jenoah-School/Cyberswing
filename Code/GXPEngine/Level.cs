@@ -45,7 +45,7 @@ public class Level : GameObject
 
         hud = new HUD();
 
-        hud.DrawHealthbar(new Vector2(64, 16) - new Vector2(game.width / 2, game.height / 2), new Vector2(384, 32), 9);
+        hud.DrawHealthbar(new Vector2(64, 32) - new Vector2(game.width / 2, game.height / 2), new Vector2(384, 32), 9);
 
         camera.AddChild(hud);
 

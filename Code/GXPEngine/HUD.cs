@@ -11,17 +11,29 @@ public class HUD : GameObject
     private int inset = 0;
 
     private EasyDraw healthText;
+    private EasyDraw negativeLightningSprite = null;
+    private EasyDraw positiveLightningSprite = null;
+
 
     public void DrawHealthbar(Vector2 _position, Vector2 _size, int _inset = 0)
     {
         inset = _inset;
 
-        EasyDraw lightningSprite = new EasyDraw("Assets/Sprites/lightning.png", false);
-        lightningSprite.SetOrigin(lightningSprite.width / 2, lightningSprite.height / 2);
-        lightningSprite.height = (int)_size.y + 32;
-        lightningSprite.width = (int)_size.y + 32;
-        lightningSprite.SetXY(_position.x, _position.y + lightningSprite.height / 4);
-        LateAddChild(lightningSprite);        
+        negativeLightningSprite = new EasyDraw("Assets/Sprites/Lightning_red.png", false);
+        negativeLightningSprite.SetOrigin(negativeLightningSprite.width / 2, negativeLightningSprite.height / 2);
+        negativeLightningSprite.height = (int)_size.y + 32;
+        negativeLightningSprite.width = (int)_size.y + 32;
+        negativeLightningSprite.SetXY(_position.x, _position.y + negativeLightningSprite.height / 4);
+        LateAddChild(negativeLightningSprite);
+
+        positiveLightningSprite = new EasyDraw("Assets/Sprites/Lighting_blue.png", false);
+        positiveLightningSprite.SetOrigin(positiveLightningSprite.width / 2, positiveLightningSprite.height / 2);
+        positiveLightningSprite.height = (int)_size.y + 32;
+        positiveLightningSprite.width = (int)_size.y + 32;
+        positiveLightningSprite.SetXY(_position.x, _position.y + positiveLightningSprite.height / 4);
+        LateAddChild(positiveLightningSprite);
+
+        negativeLightningSprite.alpha = 1;
 
         healthBar = new Sprite("Assets/Sprites/healthbar.png", false, false);
         healthBarInfill = new Sprite("Assets/Sprites/square.png", false, false);
@@ -52,6 +64,19 @@ public class HUD : GameObject
         AddChild(healthText);
     }
 
+    public void ChangeLightningPolarity(bool isPositive)
+    {
+        if (isPositive)
+        {
+            negativeLightningSprite.alpha = 1;
+            positiveLightningSprite.alpha = 0;
+        }
+        else
+        {
+            negativeLightningSprite.alpha = 0;
+            positiveLightningSprite.alpha = 1;
+        }
+    }
     public void SetHealth(float _value)
     {
         SetFillAmount(_value / 100f);

@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bullet.cs" />
+    <Compile Include="Button.cs" />
     <Compile Include="Cable.cs" />
     <Compile Include="CameraFollow.cs" />
     <Compile Include="DamageObject.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Level.cs" />
     <Compile Include="Level1.cs" />
     <Compile Include="Level2.cs" />
+    <Compile Include="Menu.cs" />
     <Compile Include="MyGame.cs" />
     <Compile Include="GXPEngine\Canvas.cs" />
     <Compile Include="GXPEngine\Game.cs" />

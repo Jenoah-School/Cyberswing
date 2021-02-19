@@ -10,6 +10,7 @@ public class MyGame : Game
 
     private Sound backgroundMusicLevel1 = null;
     private Sound backgroundMusicLevel2 = null;
+    private Sound backgroundMusicMenu = null;
 
     private SoundChannel backgroundMusicChannel = null;
 
@@ -25,6 +26,7 @@ public class MyGame : Game
 
         backgroundMusicLevel1 = new Sound("Assets/Audio/Music/BackgroundMusicLevel1.ogg", true);
         backgroundMusicLevel2 = new Sound("Assets/Audio/Music/BackgroundMusicLevel2.ogg", true);
+        backgroundMusicMenu = new Sound("Assets/Audio/Music/BackgroundMusicMenu.ogg", true);
 
         SwitchLevel(0);
 
@@ -52,6 +54,13 @@ public class MyGame : Game
 
         switch (_id)
         {
+            case 0:
+                currentLevel = new Menu();
+                if (_id != currentLevelID)
+                {
+                    backgroundMusicChannel = backgroundMusicMenu.Play();
+                }
+                break;
             case 1:
                 currentLevel = new Level1();
                 if (_id != currentLevelID)
@@ -67,10 +76,10 @@ public class MyGame : Game
                 }
                 break;
             default:
-                currentLevel = new Level1();
+                currentLevel = new Menu();
                 if (_id != currentLevelID)
                 {
-                    backgroundMusicChannel = backgroundMusicLevel1.Play();
+                    backgroundMusicChannel = backgroundMusicMenu.Play();
                 }
                 break;
         }

@@ -17,7 +17,7 @@ class Level2 : Level
     public Level2()
     {
         DrawLevel();
-        AddPlayer(256, 256, new Vector2(0 + game.width / 2, 4096 - game.width / 2), new Vector2(0, 1024 - game.height / 2));
+        AddPlayer(256, 256, new Vector2(0 + game.width / 2, 4096 - game.width / 2), new Vector2(0, 768 - game.height / 2));
         //AddPlayer(2048+196, 384-128, new Vector2(0 + game.width / 2, 4096 - game.width / 2), new Vector2(0, 1024 - game.height / 2));
         AddBackground("Assets/Sprites/background_forest_red.png");
         lowestLevelBarrier = 2048;
