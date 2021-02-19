@@ -1,10 +1,6 @@
 ﻿using GXPEngine;
 using GXPEngine.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class Player : AnimationSprite
 {
@@ -24,7 +20,6 @@ public class Player : AnimationSprite
 
     //Maximum speeds
     private float maxMoveSpeed = 4f;
-    private float maxGrappleSpeed = 4f;
 
     //Collision detection
     private Vector2 moveDirection = new Vector2();
@@ -36,12 +31,14 @@ public class Player : AnimationSprite
     private float health = 100;
     private float grappleCooldown = 0.75f;
     private float grappleLastUse = 0f;
+    private float restartTime = 0f;
 
     private bool isColliding = false;
     private bool isGrappling = false;
     private bool canStickToGrapple = false;
     private bool hookIsPositive = false;
     private bool isFlipped = false;
+    private bool hasDied = false;
 
     private int generalHealthDecrementTime = 0;
     private int movementHealthDecrementTime = 0;
@@ -49,6 +46,8 @@ public class Player : AnimationSprite
 
     private float localScale = 1f;
 
+    private Sprite blueCable = null;
+    private Sprite redCable = null;
     private Sprite grappleCable = null;
     private Vector2 grapplePos = new Vector2();
 
@@ -63,12 +62,19 @@ public class Player : AnimationSprite
 
         collisionCheckDistance = width / 2;
 
-        grappleCable = new Sprite("Assets/Sprites/square.png", false, false);
-        grappleCable.SetOrigin(grappleCable.width / 2, 0);
+        redCable = new Sprite("Assets/Sprites/chain_red.png", false, false);
+        blueCable = new Sprite("Assets/Sprites/chain_blue.png", false, false);
 
-        grappleCable.width = width / 16;
-        grappleCable.SetColor(22f / 255f, 197f / 255f, 240f / 255f);
-        grappleCable.visible = false;
+        redCable.SetOrigin(redCable.width / 2, 0);
+        blueCable.SetOrigin(blueCable.width / 2, 0);
+
+        redCable.width = width / 16;
+        blueCable.width = width / 16;
+
+        redCable.visible = false;
+        blueCable.visible = false;
+
+        grappleCable = redCable;
 
         collisionCheckObject = new Sprite("Assets/Sprites/lightning.png", false, true);
         collisionCheckObject.SetOrigin(collisionCheckObject.width / 2, collisionCheckObject.height / 2);
@@ -77,6 +83,8 @@ public class Player : AnimationSprite
         collisionCheckObject.SetColor(52f / 255f, 73f / 255f, 94f / 255f);
         collisionCheckObject.visible = false;
 
+        AddChild(redCable);
+        AddChild(blueCable);
         AddChild(grappleCable);
         AddChild(collisionCheckObject);
 
@@ -88,6 +96,24 @@ public class Player : AnimationSprite
 
     void Update()
     {
+        if (hasDied)
+        {
+            inputVelocity.y += -GameBehaviour.gravity / Time.deltaTime;
+            inputVelocity.y = Mathf.Clamp(inputVelocity.y, GameBehaviour.gravity, 100f);
+
+            if (inputVelocity.y > 0)
+            {
+                inputVelocity.y *= (fallSpeed - 1) / Time.deltaTime;
+            }
+            
+
+            y += inputVelocity.y;
+            if (Time.time >= restartTime)
+            {
+                MyGame.Instance.RestartLevel();
+            }
+            return;
+        }
         if (!canMove)
         {
             return;
@@ -114,14 +140,15 @@ public class Player : AnimationSprite
 
         if (Input.GetMouseButtonUp(1))
         {
+            StopGrapple();
             hookIsPositive = !hookIsPositive;
             if (hookIsPositive)
             {
-                grappleCable.SetColor(226f / 255f, 50f / 255f, 9f / 255f);
+                grappleCable = redCable;
             }
             else
             {
-                grappleCable.SetColor(22f / 255f, 197f / 255f, 240f / 255f);
+                grappleCable = blueCable;
 
             }
         }
@@ -371,7 +398,7 @@ public class Player : AnimationSprite
                     StopGrapple();
                 }
 
-                if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(HealthPickup) && collidedObjects[i].GetType() != typeof(ElectricNet))
+                if (collidedObjects[i] != this && collidedObjects[i].GetType() != typeof(HealthPickup) && collidedObjects[i].GetType() != typeof(ElectricNet) && collidedObjects[i].GetType() != typeof(NextLevelSwitch))
                 {
                     //Console.WriteLine($"Colliding with: {collidedObjects[i]}");
                     ResolveCollision(collidedObjects[i] as Sprite);
@@ -389,6 +416,11 @@ public class Player : AnimationSprite
     /// <param name="other">Object that collision is detected with. Gets populated automatically</param>
     public void OnCollision(GameObject other)
     {
+        if (hasDied)
+        {
+            return;
+        }
+
         //Console.WriteLine("Colliding with " + other);
         if (other.y > y && other.GetType() != typeof(HealthPickup) && other != collisionCheckObject)
         {
@@ -418,9 +450,9 @@ public class Player : AnimationSprite
         health = Mathf.Clamp(health, 0, 100);
         UpdateHealthbar();
 
-        if (health <= 0)
+        if (health <= 0 && !hasDied)
         {
-            MyGame.Instance.RestartLevel();
+            Die();
         }
     }
 
@@ -433,6 +465,17 @@ public class Player : AnimationSprite
     {
         Level currentLevel = (Level)parent;
         currentLevel.GetHUD().SetHealth(Mathf.Round(health));
+    }
+
+    public void Die()
+    {
+        canMove = false;
+        hasDied = true;
+        inputVelocity = new Vector2();
+        inputVelocity.y -= jumpHeight;
+        fallSpeed *= -GameBehaviour.gravity / 2.025f;
+        restartTime = Time.time + 1500f;
+        SetFrame(4);
     }
 
     #endregion

@@ -1,10 +1,4 @@
 ﻿using GXPEngine;
-using GXPEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class ElectricNet : DamageObject
 {
@@ -18,15 +12,15 @@ public class ElectricNet : DamageObject
         width = _width;
         height = (int)(_width * scaledHeight);
         buzzChannel = new Sound("Assets/Audio/SoundFX/ElectricBuzz.ogg", true).Play(false, 0, 0);
+        hitSound = new Sound("Assets/Audio/SoundFX/ElectricHit.ogg");
     }
 
     void Update()
     {
         if (player != null)
         {
-            float targetVolume = 0f;
             float playerDistance = DistanceTo(player);
-            targetVolume = 1f - (playerDistance/buzzDistance);
+            float targetVolume = 1f - (playerDistance / buzzDistance);
             targetVolume = Mathf.Clamp(targetVolume, 0f, 1f);
 
 
@@ -45,6 +39,10 @@ public class ElectricNet : DamageObject
             Player player = (Player)other;
             buzzChannel.Volume = 0;
             player.SetHealth(player.GetHealth() - 100);
+            if (!hasPlayedHitSound)
+            {
+                PlayHitSound();
+            }
         }
     }
 

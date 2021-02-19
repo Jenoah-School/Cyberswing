@@ -1,11 +1,6 @@
 ﻿using GXPEngine;
 using GXPEngine.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 
 public class Level : GameObject
@@ -50,7 +45,7 @@ public class Level : GameObject
 
         hud = new HUD();
 
-        hud.DrawHealthbar(new Vector2(64, 16) - new Vector2(game.width / 2, game.height / 2), new Vector2(384, 32));
+        hud.DrawHealthbar(new Vector2(64, 16) - new Vector2(game.width / 2, game.height / 2), new Vector2(384, 32), 9);
 
         camera.AddChild(hud);
 
@@ -148,10 +143,10 @@ public class Level : GameObject
                         tempBlock = new Sprite("Assets/Sprites/Blocks/main.png", true, false);
                     }
                 }
-                tempBlock.width = Mathf.Round(blockScale.x);
-                tempBlock.height = Mathf.Round(blockScale.y);
-                tempBlock.x = Mathf.Round(i * blockScale.x);
-                tempBlock.y = Mathf.Round(j * blockScale.y);
+                tempBlock.width = Mathf.Ceiling(blockScale.x);
+                tempBlock.height = Mathf.Ceiling(blockScale.y);
+                tempBlock.x = i * blockScale.x;
+                tempBlock.y = j * blockScale.y;
 
                 block.AddChild(tempBlock);
             }
@@ -178,6 +173,14 @@ public class Level : GameObject
         return electricNet;
     }
 
+    protected Turret NewTurret(int _xPos, int _yPos)
+    {
+        Turret turret = new Turret(4f);
+        turret.SetXY(_xPos, _yPos);
+
+        return turret;
+    }
+
     protected void AddBackground(string _backgroundFileName)
     {
         background = new UVOffsetSprite(_backgroundFileName, false, false);
@@ -187,11 +190,6 @@ public class Level : GameObject
         background.SetXY(-game.width / 2, -game.height / 2);
 
         LateAddChildAt(background, 0);
-    }
-
-    public void MuteAllObjects()
-    {
-
     }
 
     public Player GetPlayer()

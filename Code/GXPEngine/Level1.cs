@@ -1,10 +1,6 @@
 ﻿using GXPEngine;
 using GXPEngine.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 class Level1 : Level
@@ -18,19 +14,14 @@ class Level1 : Level
     {
         DrawLevel();
         AddPlayer(256, 256, new Vector2(0 + game.width / 2, 3712), new Vector2(0, 720 - game.height / 2));
-        //AddPlayer(1792 + 128, 64, new Vector2(0 + game.width / 2, 3712), new Vector2(0, 720 - game.height / 2));
         AddBackground("Assets/Sprites/background-forest.png");
-        //camera.scale = 2f;
-        //Add background music V1 Slow
     }
 
     private void DrawLevel()
     {
-        
-
         //Section 1
         blocks[0] = NewBlock(-128, 0, 128, 512);
-        blocks[1] = NewBlock(0, 512, 512, 512);
+        blocks[1] = NewBlock(0, 512, 512, 512, true);
         blocks[2] = NewBlock(512, 700, 512, 512);
         blocks[3] = NewBlock(1024, 512, 512, 512);
         blocks[4] = NewBlock(0, -480, 1536, 512);
@@ -56,6 +47,13 @@ class Level1 : Level
         damageObjects[1] = NewElectricNet(3072, 452);
         damageObjects[2] = NewElectricNet(3456, 452);
         damageObjects[3] = NewElectricNet(3840, 452);
+
+        NextLevelSwitch nextLevelSwitch = new NextLevelSwitch(2, "Assets/Audio/Music/Level1Complete.ogg");
+        nextLevelSwitch.width = 128;
+        nextLevelSwitch.height = 128;
+        nextLevelSwitch.SetXY(4160, 192);
+
+        AddChild(nextLevelSwitch);
 
 
         //Adding all created objects to level
@@ -86,8 +84,6 @@ class Level1 : Level
         {
             ((ElectricNet)damageObjects[i]).StopAudio();
         }
-
-        Console.WriteLine("Audio stopped");
     }
     
 }

@@ -6,9 +6,9 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B5126D4C-7FE0-4552-BC8C-E68D529C22B2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>GXPEngine</RootNamespace>
-    <AssemblyName>GXPEngine</AssemblyName>
+    <AssemblyName>Cyber Swing</AssemblyName>
     <TargetFrameworkProfile />
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
@@ -50,8 +50,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>MyGame</StartupObject>
@@ -63,6 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bullet.cs" />
+    <Compile Include="Cable.cs" />
     <Compile Include="CameraFollow.cs" />
     <Compile Include="DamageObject.cs" />
     <Compile Include="ElectricNet.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="HUD.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Level1.cs" />
+    <Compile Include="Level2.cs" />
     <Compile Include="MyGame.cs" />
     <Compile Include="GXPEngine\Canvas.cs" />
     <Compile Include="GXPEngine\Game.cs" />
@@ -114,11 +116,13 @@
     <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
+    <Compile Include="NextLevelSwitch.cs" />
     <Compile Include="OneTimeAudio.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Pickup.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PrototypeLevel.cs" />
+    <Compile Include="Turret.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -134,5 +138,8 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
   </ItemGroup>
 </Project>

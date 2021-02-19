@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 public class DamageObject : Sprite
 {
     int damage = 5;
-    bool isColliding = false;
+    protected Sound hitSound;
+    protected bool hasPlayedHitSound = false;
 
     public DamageObject(string _fileName, int _damage) : base(_fileName)
     {
@@ -21,9 +22,17 @@ public class DamageObject : Sprite
         Console.WriteLine(other);
         if(other.GetType() == typeof(Player))
         {
-            isColliding = true;
             Player player = (Player)other;
             player.SetHealth(player.GetHealth() - damage);
+        }
+    }
+
+    protected void PlayHitSound()
+    {
+        if(hitSound != null)
+        {
+            hitSound.Play();
+            hasPlayedHitSound = true;
         }
     }
 }
